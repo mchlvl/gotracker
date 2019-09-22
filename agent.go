@@ -89,7 +89,7 @@ func GetProcessExecutable(hwnd uintptr) string {
 }
 
 func Save(text string, filename string) {
-	f, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY, 0600)
+	f, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		panic(err)
 	}
