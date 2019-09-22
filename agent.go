@@ -195,11 +195,11 @@ func main() {
 				if prevAway && isAway == false {
 					// came from away = save away event
 					fmt.Println("Came from away", start)
-					start = SaveAwayEvent(start, date, iddleFor-awayTolerance)
+					start = SaveAwayEvent(start, date, awayTimeout-awayTolerance)
 				} else if isAway && prevAway == false {
 					// went away - duration of previous activity cut
 					fmt.Println("Went away", start)
-					start = SaveEvent(start, prevHwnd, prevText, date, iddleFor-awayTolerance, minDuration)
+					start = SaveEvent(start, prevHwnd, prevText, date, awayTimeout-awayTolerance, minDuration)
 				} else {
 					// window change = save
 					fmt.Println("Window changed", start)
