@@ -213,7 +213,7 @@ func main() {
 			prevAway = isAway
 		}
 
-		fmt.Println("iddleFor", iddleFor)
+		// fmt.Println("iddleFor", iddleFor)
 		time.Sleep(time.Second)
 	}
 }
