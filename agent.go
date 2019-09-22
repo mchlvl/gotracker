@@ -168,12 +168,10 @@ func main() {
 	var saveNow bool = false
 	var start time.Time = time.Now()
 	var date string = start.Format("2006-01-02")
-
 	user, _ := user.Current()
-	fmt.Println(
-		"Saving logs to ",
-		path.Join(user.HomeDir, "AppData/Roaming/TimeTrackerLogs/"),
-	)
+	var dir string = path.Join(user.HomeDir, "AppData/Roaming/TimeTrackerLogs/")
+	os.MkdirAll(dir, os.ModePerm)
+	fmt.Println("Saving logs to ", dir)
 
 	for {
 
