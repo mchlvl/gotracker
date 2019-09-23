@@ -154,11 +154,13 @@ func SaveAwayEvent(start time.Time, penalty time.Duration) time.Time {
 
 func main() {
 	// user flagged away after this long
-	var awayTimeout time.Duration = time.Second * 120
+	var awayTimeout time.Duration = time.Second * 60
 	// activity continues for this many seconds after away
-	var awayTolerance time.Duration = time.Second * 30
+	var awayTolerance time.Duration = time.Second * 10
 	// minimum duration to be captured
 	var minDuration time.Duration = time.Second * 2
+	// check activity every
+	var captureInterval time.Duration = time.Second
 
 	var iddleFor time.Duration
 	var prevText string
@@ -172,6 +174,8 @@ func main() {
 	os.MkdirAll(dir, os.ModePerm)
 	fmt.Println("Saving logs to ", dir)
 
+	var breakCondition int16 = 0
+
 	for {
 
 		// get foreground window
@@ -182,10 +186,25 @@ func main() {
 
 			// check away
 			iddleFor = IdleTime()
-			isAway = iddleFor >= awayTimeout
 
-			// if the text changed, or changed away status,
-			// save entry
+			if prevAway {
+				// break from away condition
+				if iddleFor < time.Second {
+					breakCondition += 1
+				} else if iddleFor > time.Second*5 {
+					breakCondition = 0
+				}
+				if breakCondition > 3 {
+					isAway = false
+					breakCondition = 0
+				}
+			} else {
+				// turn away conditionF
+				isAway = iddleFor >= awayTimeout
+			}
+			fmt.Println("iddleFor", iddleFor, "isAway", isAway, "prevAway", prevAway, "breakCondition", breakCondition)
+
+			// if the text changed, or changed away status = save entry
 			saveNow = (text != prevText) || (isAway != prevAway)
 			if saveNow {
 
@@ -210,7 +229,7 @@ func main() {
 			prevAway = isAway
 		}
 
-		// fmt.Println("iddleFor", iddleFor)
-		time.Sleep(time.Second)
+		// fmt.Println("iddleFor", iddleFor, "isAway", isAway)
+		time.Sleep(captureInterval)
 	}
 }
