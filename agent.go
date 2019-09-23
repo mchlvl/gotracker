@@ -202,7 +202,7 @@ func main() {
 				// turn away conditionF
 				isAway = iddleFor >= awayTimeout
 			}
-			fmt.Println("iddleFor", iddleFor, "isAway", isAway, "prevAway", prevAway, "breakCondition", breakCondition)
+			// fmt.Println("iddleFor", iddleFor, "isAway", isAway, "prevAway", prevAway, "breakCondition", breakCondition)
 
 			// if the text changed, or changed away status = save entry
 			saveNow = (text != prevText) || (isAway != prevAway)
