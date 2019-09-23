@@ -8,6 +8,13 @@ go build
 
 ## Run
 
+### Shell script (recommended)
+
+```
+run.sh
+```
+
+### From executable
 IMPORTANT - on windows make sure to run from GitBash
 
 ```
