@@ -104,7 +104,7 @@ func Save(text string, filename string) {
 func SaveEvent(
 	start time.Time,
 	prevHwnd uintptr,
-	prevText, date string,
+	prevText string,
 	penalty time.Duration,
 	threshold time.Duration) time.Time {
 	dur := time.Since(start) - penalty
@@ -116,21 +116,21 @@ func SaveEvent(
 			Window:          prevText,
 			Start:           start.Format("15:04:05"),
 			DurationSeconds: math.Round(dur.Seconds()*1000) / 1000,
-			Date:            date,
+			Date:            start.Format("2006-01-02"),
 			Day:             start.Format("Monday"),
 			TZ:              start.Format("MST"),
 			Name:            user.Name,
 			Username:        user.Username,
 		}
 		b, _ := json.Marshal(entry)
-		path := path.Join(user.HomeDir, "AppData/Roaming/TimeTrackerLogs/", date+".txt")
+		path := path.Join(user.HomeDir, "AppData/Roaming/TimeTrackerLogs/", start.Format("2006-01-02")+".txt")
 		Save(string(b), path)
 		// fmt.Println("Saved", time.Now())
 	}
 	return time.Now()
 }
 
-func SaveAwayEvent(start time.Time, date string, penalty time.Duration) time.Time {
+func SaveAwayEvent(start time.Time, penalty time.Duration) time.Time {
 	user, _ := user.Current()
 	dur := time.Since(start)
 	entry := &Entry{
@@ -138,7 +138,7 @@ func SaveAwayEvent(start time.Time, date string, penalty time.Duration) time.Tim
 		Window:          "Away",
 		Start:           start.Format("15:04:05"),
 		DurationSeconds: math.Round((dur+penalty).Seconds()*1000) / 1000,
-		Date:            date,
+		Date:            start.Format("2006-01-02"),
 		Day:             start.Format("Monday"),
 		TZ:              start.Format("MST"),
 		Name:            user.Name,
@@ -146,7 +146,7 @@ func SaveAwayEvent(start time.Time, date string, penalty time.Duration) time.Tim
 	}
 	b, _ := json.Marshal(entry)
 	start = time.Now()
-	path := path.Join(user.HomeDir, "AppData/Roaming/TimeTrackerLogs/", date+".txt")
+	path := path.Join(user.HomeDir, "AppData/Roaming/TimeTrackerLogs/", start.Format("2006-01-02")+".txt")
 	Save(string(b), path)
 	// fmt.Println("Saved Away", start)
 	return start
@@ -167,7 +167,6 @@ func main() {
 	var prevAway bool = false
 	var saveNow bool = false
 	var start time.Time = time.Now()
-	var date string = start.Format("2006-01-02")
 	user, _ := user.Current()
 	var dir string = path.Join(user.HomeDir, "AppData/Roaming/TimeTrackerLogs/")
 	os.MkdirAll(dir, os.ModePerm)
@@ -192,16 +191,16 @@ func main() {
 
 				if prevAway && isAway == false {
 					// came from away = save away event
-					fmt.Println("Came from away", start)
-					start = SaveAwayEvent(start, date, awayTimeout-awayTolerance)
+					// fmt.Println("Came from away", start)
+					start = SaveAwayEvent(start, awayTimeout-awayTolerance)
 				} else if isAway && prevAway == false {
 					// went away - duration of previous activity cut
-					fmt.Println("Went away", start)
-					start = SaveEvent(start, prevHwnd, prevText, date, awayTimeout-awayTolerance, minDuration)
+					// fmt.Println("Went away", start)
+					start = SaveEvent(start, prevHwnd, prevText, awayTimeout-awayTolerance, minDuration)
 				} else {
 					// window change = save
-					fmt.Println("Window changed", start)
-					start = SaveEvent(start, prevHwnd, prevText, date, 0, minDuration)
+					// fmt.Println("Window changed", start)
+					start = SaveEvent(start, prevHwnd, prevText, 0, minDuration)
 				}
 			}
 
