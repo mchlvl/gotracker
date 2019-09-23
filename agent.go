@@ -214,7 +214,7 @@ func main() {
 					start = SaveAwayEvent(start, awayTimeout-awayTolerance)
 				} else if isAway && prevAway == false {
 					// went away - duration of previous activity cut
-					fmt.Println("Went away", start, time.Since(start)+(awayTimeout-awayTolerance))
+					fmt.Println("Went away", start, time.Since(start)-(awayTimeout-awayTolerance))
 					start = SaveEvent(start, prevHwnd, prevText, awayTimeout-awayTolerance, minDuration)
 				} else {
 					// window change = save
