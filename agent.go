@@ -218,7 +218,7 @@ func main() {
 					start = SaveEvent(start, prevHwnd, prevText, awayTimeout-awayTolerance, minDuration)
 				} else if !isAway {
 					// window change = save
-					fmt.Println("Window changed", start, time.Since(start))
+					// fmt.Println("Window changed", start, time.Since(start))
 					start = SaveEvent(start, prevHwnd, prevText, 0, minDuration)
 				}
 			}
