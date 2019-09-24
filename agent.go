@@ -208,15 +208,15 @@ func main() {
 			saveNow = (text != prevText) || (isAway != prevAway)
 			if saveNow {
 
-				if prevAway && isAway == false {
+				if prevAway && !isAway {
 					// came from away = save away event
 					fmt.Println("Came from away", start, time.Since(start)+(awayTimeout-awayTolerance))
 					start = SaveAwayEvent(start, awayTimeout-awayTolerance)
-				} else if isAway && prevAway == false {
+				} else if isAway && !prevAway {
 					// went away - duration of previous activity cut
 					fmt.Println("Went away", start, time.Since(start)-(awayTimeout-awayTolerance))
 					start = SaveEvent(start, prevHwnd, prevText, awayTimeout-awayTolerance, minDuration)
-				} else {
+				} else if !isAway {
 					// window change = save
 					fmt.Println("Window changed", start, time.Since(start))
 					start = SaveEvent(start, prevHwnd, prevText, 0, minDuration)
