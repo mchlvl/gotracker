@@ -1,6 +1,6 @@
 # Gotracker
 
-> Saves activity logs to user/AppData/Roaming/TimeTrackerLogs. Path currently not configurable
+Saves activity logs to `{user}/AppData/Roaming/TimeTrackerLogs`. Path currently not configurable
 
 Logs can be parsed with [gotracker-parser](https://github.com/mchlvl/gotracker-parser) CLI.
 
