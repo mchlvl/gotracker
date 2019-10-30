@@ -187,7 +187,7 @@ func main() {
 	// activity continues for this many seconds after away
 	var awayTolerance time.Duration = time.Second * 10
 	// minimum duration to be captured
-	var minDuration time.Duration = time.Second * 2
+	var minDuration time.Duration = time.Second
 	// check activity every
 	var captureInterval time.Duration = time.Second
 
