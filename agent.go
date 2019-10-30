@@ -191,7 +191,7 @@ func main() {
 	// check activity every
 	var captureInterval time.Duration = time.Second
 
-	var iddleFor time.Duration
+	var idleFor time.Duration
 	var prevText string
 	var prevHwnd uintptr
 	var isAway bool = false
@@ -214,13 +214,13 @@ func main() {
 			text := GetWindowText(hwnd)
 
 			// check away
-			iddleFor = IdleTime()
+			idleFor = IdleTime()
 
 			if prevAway {
 				// break from away condition
-				if iddleFor < time.Second {
+				if idleFor < time.Second {
 					breakCondition += 1
-				} else if iddleFor > time.Second*5 {
+				} else if idleFor > time.Second*5 {
 					breakCondition = 0
 				}
 				if breakCondition > 3 {
@@ -229,9 +229,9 @@ func main() {
 				}
 			} else {
 				// turn away conditionF
-				isAway = iddleFor >= awayTimeout
+				isAway = idleFor >= awayTimeout
 			}
-			// fmt.Println("iddleFor", iddleFor, "isAway", isAway, "prevAway", prevAway, "breakCondition", breakCondition)
+			// fmt.Println("idleFor", idleFor, "isAway", isAway, "prevAway", prevAway, "breakCondition", breakCondition)
 
 			// if the text changed, or changed away status = save entry
 			saveNow = (text != prevText) || (isAway != prevAway)
@@ -239,11 +239,11 @@ func main() {
 
 				if prevAway && !isAway {
 					// came from away = save away event
-					fmt.Println("Came from away", start, time.Since(start)+(awayTimeout-awayTolerance))
+					fmt.Println(time.Now(), "Came from away, start:", start, "dur:", time.Since(start)+(awayTimeout-awayTolerance))
 					start = SaveAwayEvent(start, awayTimeout-awayTolerance)
 				} else if isAway && !prevAway {
 					// went away - duration of previous activity cut
-					fmt.Println("Went away", start, time.Since(start)-(awayTimeout-awayTolerance))
+					fmt.Println(time.Now(), "Went away, start:", start, "dur:", time.Since(start)-(awayTimeout-awayTolerance))
 					start = SaveEvent(start, prevHwnd, prevText, awayTimeout-awayTolerance, minDuration)
 				} else if !isAway {
 					// window change = save
@@ -258,7 +258,7 @@ func main() {
 			prevAway = isAway
 		}
 
-		// fmt.Println("iddleFor", iddleFor, "isAway", isAway)
+		fmt.Println(time.Now(), "idleFor", idleFor, "isAway", isAway)
 		time.Sleep(captureInterval)
 	}
 }
