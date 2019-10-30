@@ -7,6 +7,8 @@ import (
 	"os"
 	"os/user"
 	"path"
+	"strconv"
+	"strings"
 	"syscall"
 	"time"
 	"unsafe"
@@ -101,6 +103,28 @@ func Save(text string, filename string) {
 	}
 }
 
+func IncrementTime(start time.Time) (time.Time, string) {
+	hoursThreshold := 4
+	separator := ":"
+
+	startString := start.Format("15:04:05")
+
+	if start.Hour() < hoursThreshold {
+		// set the date to previous day
+		start = start.AddDate(0, 0, -1)
+
+		// increment time
+		startString = start.Format("15:04:05")
+		splitString := strings.SplitN(startString, separator, 2)
+		s, _ := strconv.Atoi(splitString[0])
+		increased := s + 24
+		startString = strconv.Itoa(increased) + separator + splitString[1]
+
+	}
+
+	return start, startString
+}
+
 func SaveEvent(
 	start time.Time,
 	prevHwnd uintptr,
@@ -111,10 +135,15 @@ func SaveEvent(
 	if dur > threshold {
 		user, _ := user.Current()
 		exe := GetProcessExecutable(prevHwnd)
+
+		// early morning data attributed to the previous day
+		var startString string
+		start, startString = IncrementTime(start)
+
 		entry := &Entry{
 			Executable:      exe,
 			Window:          prevText,
-			Start:           start.Format("15:04:05"),
+			Start:           startString,
 			DurationSeconds: math.Round(dur.Seconds()*1000) / 1000,
 			Date:            start.Format("2006-01-02"),
 			Day:             start.Format("Monday"),

@@ -1,8 +1,10 @@
 # Gotracker
 
-Saves activity logs to `{user}/AppData/Roaming/TimeTrackerLogs`. Path currently not configurable
+Saves activity logs to `{user}/AppData/Roaming/TimeTrackerLogs`. Path currently not configurable.
 
 Logs can be parsed with [gotracker-parser](https://github.com/mchlvl/gotracker-parser) CLI.
+
+Early activity attributed to previous day - clock runs 04:00-28:00 (instead of 00:00-24:00).
 
 ## Build
 
