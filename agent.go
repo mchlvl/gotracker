@@ -192,6 +192,7 @@ func main() {
 	var captureInterval time.Duration = time.Second
 
 	var idleFor time.Duration
+	var prevIdleFor time.Duration
 	var prevText string
 	var prevHwnd uintptr
 	var isAway bool = false
@@ -230,6 +231,12 @@ func main() {
 			} else {
 				// turn away conditionF
 				isAway = idleFor >= awayTimeout
+
+				// check if input no longer updated
+				if (prevIdleFor == idleFor) && (idleFor != time.Second*0) {
+					isAway = true
+					fmt.Println(time.Now(), "idle stale => Went away.", "idleFor", idleFor, "prevIdleFor", prevIdleFor)
+				}
 			}
 			// fmt.Println("idleFor", idleFor, "isAway", isAway, "prevAway", prevAway, "breakCondition", breakCondition)
 
@@ -256,9 +263,10 @@ func main() {
 			prevText = text
 			prevHwnd = hwnd
 			prevAway = isAway
+			prevIdleFor = idleFor
 		}
 
-		fmt.Println(time.Now(), "idleFor", idleFor, "isAway", isAway)
+		// fmt.Println(time.Now(), "idleFor", idleFor, "isAway", isAway, "prevIdleFor", prevIdleFor)
 		time.Sleep(captureInterval)
 	}
 }
