@@ -192,7 +192,6 @@ func main() {
 	var captureInterval time.Duration = time.Second
 
 	var idleFor time.Duration
-	var prevIdleFor time.Duration
 	var prevText string
 	var prevHwnd uintptr
 	var isAway bool = false
@@ -209,64 +208,56 @@ func main() {
 	for {
 
 		// get foreground window
-		if hwnd, _, _ := procGetForegroundWindow.Call(); hwnd != 0 {
+		hwnd, _, _ := procGetForegroundWindow.Call()
 
-			// get the text of the window
-			text := GetWindowText(hwnd)
+		// get the text of the window
+		text := GetWindowText(hwnd)
 
-			// check away
-			idleFor = IdleTime()
+		// check away
+		idleFor = IdleTime()
 
-			if prevAway {
-				// break from away condition
-				if idleFor < time.Second {
-					breakCondition += 1
-				} else if idleFor > time.Second*5 {
-					breakCondition = 0
-				}
-				if breakCondition > 3 {
-					isAway = false
-					breakCondition = 0
-				}
-			} else {
-				// turn away conditionF
-				isAway = idleFor >= awayTimeout
-
-				// check if input no longer updated
-				if (prevIdleFor == idleFor) && (idleFor != time.Second*0) {
-					isAway = true
-					fmt.Println(time.Now(), "idle stale => Went away.", "idleFor", idleFor, "prevIdleFor", prevIdleFor)
-				}
+		if prevAway {
+			// break from away condition
+			if idleFor < time.Second {
+				breakCondition += 1
+			} else if idleFor > time.Second*5 {
+				breakCondition = 0
 			}
-			// fmt.Println("idleFor", idleFor, "isAway", isAway, "prevAway", prevAway, "breakCondition", breakCondition)
-
-			// if the text changed, or changed away status = save entry
-			saveNow = (text != prevText) || (isAway != prevAway)
-			if saveNow {
-
-				if prevAway && !isAway {
-					// came from away = save away event
-					fmt.Println(time.Now(), "Came from away, start:", start, "dur:", time.Since(start)+(awayTimeout-awayTolerance))
-					start = SaveAwayEvent(start, awayTimeout-awayTolerance)
-				} else if isAway && !prevAway {
-					// went away - duration of previous activity cut
-					fmt.Println(time.Now(), "Went away, start:", start, "dur:", time.Since(start)-(awayTimeout-awayTolerance))
-					start = SaveEvent(start, prevHwnd, prevText, awayTimeout-awayTolerance, minDuration)
-				} else if !isAway {
-					// window change = save
-					// fmt.Println("Window changed", start, time.Since(start))
-					start = SaveEvent(start, prevHwnd, prevText, 0, minDuration)
-				}
+			if breakCondition > 3 {
+				isAway = false
+				breakCondition = 0
 			}
+		} else {
+			// turn away conditionF
+			isAway = idleFor >= awayTimeout //|| hwnd == 0
+		}
+		// fmt.Println("idleFor", idleFor, "isAway", isAway, "prevAway", prevAway, "breakCondition", breakCondition)
 
-			// set new previous
-			prevText = text
-			prevHwnd = hwnd
-			prevAway = isAway
-			prevIdleFor = idleFor
+		// if the text changed, or changed away status = save entry
+		saveNow = (text != prevText) || (isAway != prevAway)
+		if saveNow {
+
+			if prevAway && !isAway {
+				// came from away = save away event
+				fmt.Println(time.Now(), "Came from away, start:", start, "dur:", time.Since(start)+(awayTimeout-awayTolerance))
+				start = SaveAwayEvent(start, awayTimeout-awayTolerance)
+			} else if isAway && !prevAway {
+				// went away - duration of previous activity cut
+				fmt.Println(time.Now(), "Went away, start:", start, "dur:", time.Since(start)-(awayTimeout-awayTolerance))
+				start = SaveEvent(start, prevHwnd, prevText, awayTimeout-awayTolerance, minDuration)
+			} else if !isAway {
+				// window change = save
+				// fmt.Println("Window changed", start, time.Since(start))
+				start = SaveEvent(start, prevHwnd, prevText, 0, minDuration)
+			}
 		}
 
-		// fmt.Println(time.Now(), "idleFor", idleFor, "isAway", isAway, "prevIdleFor", prevIdleFor)
+		// set new previous
+		prevText = text
+		prevHwnd = hwnd
+		prevAway = isAway
+
+		fmt.Println(time.Now(), "idleFor", idleFor, "isAway", isAway, "hwnd", hwnd, "prevHwnd", prevHwnd)
 		time.Sleep(captureInterval)
 	}
 }
