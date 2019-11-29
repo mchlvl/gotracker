@@ -257,7 +257,7 @@ func main() {
 		prevHwnd = hwnd
 		prevAway = isAway
 
-		fmt.Println(time.Now(), "idleFor", idleFor, "isAway", isAway, "hwnd", hwnd, "prevHwnd", prevHwnd)
+		// fmt.Println(time.Now(), "idleFor", idleFor, "isAway", isAway, "hwnd", hwnd, "prevHwnd", prevHwnd)
 		time.Sleep(captureInterval)
 	}
 }
